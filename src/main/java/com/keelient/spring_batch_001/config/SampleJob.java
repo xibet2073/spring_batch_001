@@ -25,6 +25,7 @@ public class SampleJob {
         return jobBuilderFactory
                 .get("First job")  // This is the job name
                 .start(firstStep())
+                .next(secondStep()) // For all subsequent steps
                 .build();// Starts a step
     }
 
@@ -40,9 +41,26 @@ public class SampleJob {
             @Override
             public RepeatStatus execute(StepContribution stepContribution, ChunkContext chunkContext) throws Exception {
                 // The tasklet logic
-                System.out.println("<<< -- This is first tasklet step --- >>>");
+                System.out.println("<<< -- This is the tasklet of step 1 --- >>>");
                 return RepeatStatus.FINISHED;
             }
         };
     }
+    private Step secondStep() {
+        return stepBuilderFactory
+                .get("Second step")  // This is the step name
+                .tasklet(secondTask())
+                .build();// Invokes a tasklet
+    }
+    private Tasklet secondTask() {
+        return new Tasklet() {
+            @Override
+            public RepeatStatus execute(StepContribution stepContribution, ChunkContext chunkContext) throws Exception {
+                // The tasklet logic
+                System.out.println("<<< -- This is the tasklet of step 2 --- >>>");
+                return RepeatStatus.FINISHED;
+            }
+        };
+    }
+
 }
